@@ -33,11 +33,11 @@ return {
         "graphql",
         "emmet_ls",
         "prismals",
-        "pyright",
         "csharp_ls",
         "jsonls",
         "clangd",
-        "ruff",
+        "pylsp",
+        "omnisharp",
       },
     })
   end,
