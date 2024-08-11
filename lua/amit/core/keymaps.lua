@@ -51,3 +51,5 @@ keymap.set("v", "<leader>y", ":'<,'>w !clip.exe<CR><C-v><C-c>")
 -- cut into system clip board (as well as the internal wsl one)
 keymap.set("n", "<leader>x", ":'<,'>w !clip.exe<CR>")
 keymap.set("v", "<leader>x", ":'<,'>w !clip.exe<CR>")
+
+keymap.set("t", "<C-space>", "<C-\\><C-n>")
