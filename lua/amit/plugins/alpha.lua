@@ -1,4 +1,3 @@
--- Open the file and generate the tree
 local file = io.open("tree.txt", "w+")
 os.execute("pybonsai > tree.txt")
 file:close() -- Close the file after writing
@@ -46,139 +45,102 @@ local function strip_tree_boundaries_to_file(input_lines, output_file)
 	return trimmed_lines
 end
 
--- Open the output file for writing
-local file2 = io.open("tree2.txt", "w+")
-local function get_file_dimensions(file_path)
-	local file = io.open(file_path, "r")
-	local width = 0
-	local height = 0
-
-	for line in file:lines() do
-		height = height + 1
-		local line_width = #line
-		if line_width > width then
-			width = line_width
-		end
+local count = 0
+local function ansi_truecolor_to_hex(ansi_code)
+	-- Split the ANSI code by ";"
+	local parts = {}
+	for part in string.gmatch(ansi_code, "([^;]+)") do
+		table.insert(parts, part)
 	end
 
-	file:close()
-	return width
+	-- Convert parts to integers and then to hex
+	local r = string.format("%02X", tonumber(parts[#parts - 2]))
+	local g = string.format("%02X", tonumber(parts[#parts - 1]))
+	local b = string.format("%02X", tonumber(parts[#parts]))
+
+	-- Return hex color code
+	return string.format("#%s%s%s", r, g, b)
 end
 
-local function get_file_dimensions2(file_path)
-	local file = io.open(file_path, "r")
-	local width = 0
-	local height = 0
+local function hex_to_vim_highlight(color)
+	-- Create Vim highlight command
 
+	local vim_command = string.format(":highlight %s guifg=%s guibg=NONE", tostring(count), color)
+	count = count + 1
+	vim.cmd(vim_command)
+	return tostring(count - 1)
+end
+function convert_ansi_tree_to_vim_hl_tree(file_path)
+	-- converts a textfile into a alphanvim dashboard
+	local dashboard = {}
 	for line in file:lines() do
-		height = height + 1
+		table.insert(dashboard, "")
+		local i = 0
+		while i <= #line do
+			if line[i] ~= "\27" then
+				dashboard[#dashboard] = dashboard[#dashboard] .. line[i]
+				i = i + 1
+			elseif line[i] == "\27" then
+				i = i + 2
+				local asni_code = ""
+				while line[i] ~= "m" do
+					asni_code = asni_code .. line[i]
+					i = i + 1
+				end
+				i = i + 1
+				local hex_code = ansi_truecolor_to_hex(asni_code)
+				local hl_name = hex_to_vim_highlight(hex_code)
+				dashboard[#dashboard] = dashboard[#dashboard] .. hl_name
+			end
+		end
 	end
+end
 
-	file:close()
-	return height
+local buff_id = vim.api.nvim_get_current_buf()
+local function highlight_alpha_dashboard(buf_id)
+	-- Assuming you want to loop through all lines in the dashboard
+	local lines = vim.api.nvim_buf_get_lines(buf_id, 0, -1, false)
+
+	for line_num, line in ipairs(lines) do
+		-- Loop through each character in the line
+		for col_num = 0, #line do
+			-- Example: Highlight each character in a different color
+			vim.api.nvim_buf_add_highlight(buf_id, -1, "Function", line_num - 1, col_num, col_num + 1)
+		end
+	end
 end
 
 return {
-
-	"nvimdev/dashboard-nvim",
+	"goolord/alpha-nvim",
 	event = "VimEnter",
 	config = function()
-		require("dashboard").setup({
-			theme = "doom",
-			hide = {
-				statusline = true,
-				tabline = true,
-				winbar = true,
-			},
-			config = {
-				header = strip_tree_boundaries_to_file(lines, file2),
-				io.close(file2),
-				disable_move = true,
-				center = {
-					{
-						icon = " 󰈔 \t",
-						icon_hl = "DashboardIcon",
-						desc = "Open file",
-						desc_hl = "DashboardDesc",
-						key = "1",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Telescope find_files",
-					},
-					{
-						icon = " 󰈞 \t",
-						icon_hl = "Title",
-						desc = "Fuzzy Grep",
-						desc_hl = "DashboardDesc",
-						key = "2",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Telescope live_grep",
-					},
-					{
-						icon = " 󰂺 \t",
-						icon_hl = "Title",
-						desc = "Open Readme",
-						desc_hl = "DashboardDesc",
-						key = "3",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Glow README.md",
-					},
-					{
-						icon = "  \t",
-						icon_hl = "DashboardIcon",
-						desc = "Git History",
-						desc_hl = "DashboardDesc",
-						key = "4",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Telescope git_commits",
-					},
-					{
-						icon = "  \t",
-						icon_hl = "Title",
-						desc = "Mason Config",
-						desc_hl = "DashboardDesc",
-						key = "5",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Mason",
-					},
-					{
-						icon = "  \t",
-						icon_hl = "Title",
-						desc = "LazyVim Config",
-						desc_hl = "DashboardDesc",
-						key = "6",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Lazy",
-					},
-					{
-						icon = "  \t",
-						icon_hl = "Title",
-						desc = "Vim Options",
-						desc_hl = "DashboardDesc",
-						key = "7",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "Telescope vim_options",
-					},
-					{
-						icon = " 󰈆 \t",
-						icon_hl = "Title",
-						desc = "Quit NeoVim",
-						desc_hl = "DashboardDesc",
-						key = "0",
-						key_hl = "Number",
-						key_format = " %s.", -- `%s` will be substituted with value of `key`
-						action = "qa",
-					},
-				},
-			},
-		})
-	end,
+		local alpha = require("alpha")
+		local dashboard = require("alpha.themes.dashboard")
 
-	dependencies = { { "nvim-tree/nvim-web-devicons" } },
+		-- Set header
+		dashboard.section.header.val = {
+			"                                                     ",
+			"  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
+			"  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
+			"  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
+			"  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
+			"  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
+			"  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
+			"                                                     ",
+		}
+
+		-- Set menu
+		dashboard.section.buttons.val = {
+			dashboard.button("%", "  > New File", "<cmd>ene<CR>"),
+			dashboard.button("SPC ff", "󰱼  > Find File", "<cmd>Telescope find_files<CR>"),
+			dashboard.button("SPC <C-r>", "󰁯  > Restore Session", "<cmd>SessionRestore<CR>"),
+			dashboard.button("q", "  > Quit NVIM", "<cmd>qa<CR>"),
+		}
+
+		-- Send config to alpha
+		alpha.setup(dashboard.opts)
+
+		-- Disable folding on alpha buffer
+		vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
+	end,
 }
