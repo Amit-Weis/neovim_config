@@ -52,4 +52,4 @@ keymap.set("v", "<leader>y", ":'<,'>w !clip.exe<CR><C-v><C-c>")
 keymap.set("n", "<leader>x", ":'<,'>w !clip.exe<CR>")
 keymap.set("v", "<leader>x", ":'<,'>w !clip.exe<CR>")
 
-keymap.set("t", "<C-space>", "<C-\\><C-n>")
+keymap.set("t", "<C-space>", "<C-\\><C-n>", { desc = "exit terminal properly" })
