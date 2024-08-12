@@ -143,5 +143,9 @@ return {
 		})
 	end,
 }
--- TODO: add the above configed lagnauges to mason
--- TODO: kys
+-- TODO: fix auto complete being fucking massive for some reason
+-- TODO: try and get started on screenkey_copy?
+-- TODO: orginize shit this place is a mess
+-- TODO: figure out if vim is for me :(
+-- TODO: fix cpp lsp from being fucking stupid.
+-- TODO: kill yourslef
