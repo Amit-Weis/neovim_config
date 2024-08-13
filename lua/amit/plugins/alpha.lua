@@ -1,23 +1,24 @@
 local file = io.open("tree.txt", "w+")
 os.execute("pybonsai > tree.txt")
-file:close() -- Close the file after writing
+file:close()
 
--- Reopen the file to read its content
 file = io.open("tree.txt", "r")
 local lines = {}
 for line in file:lines() do
 	table.insert(lines, line)
 end
-file:close() -- Close the file after reading
+file:close()
 
 -- Define the function to strip the tree boundaries and write to another file
+-- Function to strip tree boundaries and write to a file
 local function strip_tree_boundaries_to_file(input_lines, output_file)
 	local first_escape_line = -1
 	local last_escape_line = -1
 	local escape_char = "\27" -- This is the escape character (ASCII 27)
 
 	local leftmost_col, rightmost_col = math.huge, 0
-	-- Find the first and second-last lines containing the escape character
+
+	-- Identify the boundary lines and columns
 	for i = 2, #input_lines - 1 do
 		if input_lines[i]:find(escape_char) then
 			local first_non_whitespace = input_lines[i]:find(escape_char)
@@ -30,84 +31,107 @@ local function strip_tree_boundaries_to_file(input_lines, output_file)
 		end
 	end
 
-	-- Determine the leftmost and rightmost points of the tree
-	-- Trim the lines to the leftmost and rightmost boundaries
+	-- Trim the lines based on the identified boundaries
 	local trimmed_lines = {}
 	for i = first_escape_line, last_escape_line - 1 do
 		local trimmed_line = input_lines[i]:sub(leftmost_col, rightmost_col)
 		table.insert(trimmed_lines, trimmed_line)
 	end
 
-	-- Write the trimmed lines to the output file
+	-- Write trimmed lines to the output file
 	for _, line in ipairs(trimmed_lines) do
 		output_file:write(line .. "\n")
 	end
+
 	return trimmed_lines
 end
 
-local count = 0
-local function ansi_truecolor_to_hex(ansi_code)
-	-- Split the ANSI code by ";"
-	local parts = {}
-	for part in string.gmatch(ansi_code, "([^;]+)") do
-		table.insert(parts, part)
+local file2 = io.open("tree2.txt", "w+")
+local function center_tree(tree_lines)
+	local max_width = 0
+	local trunk_pos = nil
+	local first_dot_pos = 0
+	local second_dot_pos = 0
+
+	-- Find the trunk line and calculate the maximum width
+	for i = 1, #tree_lines, 1 do
+		local width = #tree_lines[i]
+		if width > max_width then
+			max_width = width
+		end
+
+		-- Locate the trunk by searching for the first and last period on the line
+		first_dot_pos = tree_lines[i]:find("%.")
+		second_dot_pos = tree_lines[i]:find("%.[^%.]*$")
+
+		if first_dot_pos and second_dot_pos then
+			trunk_pos = math.floor((first_dot_pos + second_dot_pos) / 2)
+		end
 	end
 
-	-- Convert parts to integers and then to hex
-	local r = string.format("%02X", tonumber(parts[#parts - 2]))
-	local g = string.format("%02X", tonumber(parts[#parts - 1]))
-	local b = string.format("%02X", tonumber(parts[#parts]))
+	if not trunk_pos then
+		error("Trunk position not found.")
+	end
 
-	-- Return hex color code
-	return string.format("#%s%s%s", r, g, b)
-end
+	-- Calculate the centered position of the trunk
+	local centered_trunk_pos = math.floor((max_width + 1) / 2) - math.floor((second_dot_pos - first_dot_pos) / 2)
 
-local function hex_to_vim_highlight(color)
-	-- Create Vim highlight command
+	-- Center all lines based on the trunk position
+	local centered_tree = {}
+	local pad = centered_trunk_pos - trunk_pos
 
-	local vim_command = string.format(":highlight %s guifg=%s guibg=NONE", tostring(count), color)
-	count = count + 1
-	vim.cmd(vim_command)
-	return tostring(count - 1)
-end
-function convert_ansi_tree_to_vim_hl_tree(file_path)
-	-- converts a textfile into a alphanvim dashboard
+	for i = 1, #tree_lines, 1 do
+		if pad > 0 then
+			table.insert(centered_tree, string.rep(" ", pad) .. tree_lines[i])
+		else
+			table.insert(centered_tree, tree_lines[i] .. string.rep(" ", -pad))
+		end
+	end
+
+	return centered_tree
+end -- Main function to process the ANSI file and apply highlights
+
+local function convert_ansi_tree_to_vim_hl_tree(file_path)
+	-- Converts a text file into an alpha-nvim dashboard with applied highlights
 	local dashboard = {}
-	for line in file:lines() do
+	local file3 = io.open(file_path, "r")
+	local lines2 = {}
+	for line in file3:lines() do
+		table.insert(lines2, line)
+	end
+
+	for _, line in ipairs(lines2) do
 		table.insert(dashboard, "")
-		local i = 0
+		local i = 1
+		local current_hl = nil -- To track the current highlight
 		while i <= #line do
-			if line[i] ~= "\27" then
-				dashboard[#dashboard] = dashboard[#dashboard] .. line[i]
-				i = i + 1
-			elseif line[i] == "\27" then
-				i = i + 2
-				local asni_code = ""
-				while line[i] ~= "m" do
-					asni_code = asni_code .. line[i]
-					i = i + 1
+			local char = line:sub(i, i)
+			if char ~= "\27" then
+				-- If there's an active highlight, wrap the character with the highlight
+				if current_hl then
+					dashboard[#dashboard] = dashboard[#dashboard] .. ("%s"):format(current_hl, char)
+				else
+					dashboard[#dashboard] = dashboard[#dashboard] .. char
 				end
 				i = i + 1
-				local hex_code = ansi_truecolor_to_hex(asni_code)
-				local hl_name = hex_to_vim_highlight(hex_code)
-				dashboard[#dashboard] = dashboard[#dashboard] .. hl_name
+			else
+				-- Skip the escape sequence
+				i = i + 2
+				local ansi_code = ""
+				while line:sub(i, i) ~= "m" do
+					ansi_code = ansi_code .. line:sub(i, i)
+					i = i + 1
+				end
+				-- Move past the 'm' character
+				i = i + 1
+				-- Convert the ANSI code to a Vim highlight group
+				-- local hex_code = ansi_truecolor_to_hex(ansi_code)
+				-- current_hl = hex_to_vim_highlight(hex_code)
 			end
 		end
 	end
-end
-
-local buff_id = vim.api.nvim_get_current_buf()
-local function highlight_alpha_dashboard(buf_id)
-	-- Assuming you want to loop through all lines in the dashboard
-	local lines = vim.api.nvim_buf_get_lines(buf_id, 0, -1, false)
-
-	for line_num, line in ipairs(lines) do
-		-- Loop through each character in the line
-		for col_num = 0, #line do
-			-- Example: Highlight each character in a different color
-			vim.api.nvim_buf_add_highlight(buf_id, -1, "Function", line_num - 1, col_num, col_num + 1)
-		end
-	end
+	file3:close()
+	return center_tree(dashboard)
 end
 
 return {
@@ -118,16 +142,7 @@ return {
 		local dashboard = require("alpha.themes.dashboard")
 
 		-- Set header
-		dashboard.section.header.val = {
-			"                                                     ",
-			"  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
-			"  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
-			"  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
-			"  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
-			"  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
-			"  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
-			"                                                     ",
-		}
+		dashboard.section.header.val = convert_ansi_tree_to_vim_hl_tree("tree2.txt")
 
 		-- Set menu
 		dashboard.section.buttons.val = {
