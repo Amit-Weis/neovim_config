@@ -47,11 +47,13 @@ local function strip_tree_boundaries_to_file(input_lines, output_file)
 end
 
 local file2 = io.open("tree2.txt", "w+")
+strip_tree_boundaries_to_file(lines, file2)
+
 local function center_tree(tree_lines)
 	local max_width = 0
 	local trunk_pos = nil
-	local first_dot_pos = 0
-	local second_dot_pos = 0
+	local first_dot_pos = nil
+	local second_dot_pos = nil
 
 	-- Find the trunk line and calculate the maximum width
 	for i = 1, #tree_lines, 1 do
@@ -60,15 +62,31 @@ local function center_tree(tree_lines)
 			max_width = width
 		end
 
-		-- Locate the trunk by searching for the first and last period on the line
-		first_dot_pos = tree_lines[i]:find("%.")
-		second_dot_pos = tree_lines[i]:find("%.[^%.]*$")
+		local trunk_start = "./"
+		local trunk_end = "\\."
+		if not first_dot_pos and not second_dot_pos then
+			first_dot_pos = string.find(tree_lines[i], trunk_start, 1, true)
 
-		if first_dot_pos and second_dot_pos then
-			trunk_pos = math.floor((first_dot_pos + second_dot_pos) / 2)
+			if first_dot_pos then
+				second_dot_pos = string.find(tree_lines[i], trunk_end, first_dot_pos + 1, true)
+			end
+
+			if first_dot_pos and second_dot_pos then
+				trunk_pos = math.floor((first_dot_pos + second_dot_pos) / 2)
+			else
+				first_dot_pos = nil
+				second_dot_pos = nil
+			end
 		end
 	end
 
+	if not first_dot_pos then
+		error("something went really wrong")
+	end
+
+	if not second_dot_pos then
+		error("second wrong too")
+	end
 	if not trunk_pos then
 		error("Trunk position not found.")
 	end
@@ -82,9 +100,16 @@ local function center_tree(tree_lines)
 
 	for i = 1, #tree_lines, 1 do
 		if pad > 0 then
-			table.insert(centered_tree, string.rep(" ", pad) .. tree_lines[i])
+			table.insert(centered_tree, " ")
+			for _ = 2, pad, 1 do
+				centered_tree[i] = centered_tree[i] .. " "
+			end
+			centered_tree[i] = centered_tree[i] .. tree_lines[i]
 		else
-			table.insert(centered_tree, tree_lines[i] .. string.rep(" ", -pad))
+			table.insert(centered_tree, tree_lines[i])
+			for _ = 1, -pad, 1 do
+				centered_tree[i] = centered_tree[i] .. " "
+			end
 		end
 	end
 
@@ -131,6 +156,11 @@ local function convert_ansi_tree_to_vim_hl_tree(file_path)
 		end
 	end
 	file3:close()
+	local file4 = io.open("tree4.txt", "w+")
+	for _, line in ipairs(dashboard) do
+		file4:write(line .. "\n")
+	end
+	io.close(file4)
 	return center_tree(dashboard)
 end
 
