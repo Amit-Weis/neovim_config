@@ -1,5 +1,6 @@
 local file = io.open("tree.txt", "w+")
 os.execute("pybonsai > tree.txt")
+
 file:close()
 
 file = io.open("tree.txt", "r")
@@ -55,8 +56,11 @@ local function center_tree(tree_lines)
 	local first_dot_pos = nil
 	local second_dot_pos = nil
 
+	local centered_tree = {}
+
 	-- Find the trunk line and calculate the maximum width
 	for i = 1, #tree_lines, 1 do
+		table.insert(centered_tree, tree_lines[i])
 		local width = #tree_lines[i]
 		if width > max_width then
 			max_width = width
@@ -91,26 +95,22 @@ local function center_tree(tree_lines)
 		error("Trunk position not found.")
 	end
 
-	-- Calculate the centered position of the trunk
 	local centered_trunk_pos = math.floor((max_width + 1) / 2) - math.floor((second_dot_pos - first_dot_pos) / 2)
 
-	-- Center all lines based on the trunk position
-	local centered_tree = {}
-	local pad = centered_trunk_pos - trunk_pos
-
-	for i = 1, #tree_lines, 1 do
-		if pad > 0 then
-			table.insert(centered_tree, " ")
-			for _ = 2, pad, 1 do
-				centered_tree[i] = centered_tree[i] .. " "
-			end
-			centered_tree[i] = centered_tree[i] .. tree_lines[i]
-		else
-			table.insert(centered_tree, tree_lines[i])
-			for _ = 1, -pad, 1 do
+	while trunk_pos ~= centered_trunk_pos do
+		local pad = centered_trunk_pos - trunk_pos
+		for i = 1, #tree_lines, 1 do
+			if pad > 0 then
+				centered_tree[i] = " " .. centered_tree[i]
+			else
 				centered_tree[i] = centered_tree[i] .. " "
 			end
 		end
+		if pad > 0 then
+			trunk_pos = trunk_pos + 1
+		end
+		max_width = max_width + 1
+		centered_trunk_pos = math.floor((max_width + 1) / 2) - math.floor((second_dot_pos - first_dot_pos) / 2)
 	end
 
 	return centered_tree
