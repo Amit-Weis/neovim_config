@@ -38,7 +38,6 @@ keymap.set("v", "<C-c>", "y<C-c>", { desc = "copy paste like normal lol" }) -- c
 keymap.set("i", "<C-s>", "<C-c>:w<ENTER>", { desc = "save in insert mode" }) -- save in insert mode and return to normal mode
 keymap.set("n", "<C-s>", ":w<ENTER>", { desc = "save in normal mode" }) -- save in normal mode
 
-keymap.set("n", "<leader>fl", vim.cmd.Ex, { desc = "goes to file exploerer" }) -- goes to file exploerer
 vim.keymap.set("n", "<leader>=", "<C-a>", { desc = "Increment number under cursor" })
 vim.keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number under cursor" })
 
@@ -53,3 +52,5 @@ keymap.set("n", "<leader>x", ":'<,'>w !clip.exe<CR>")
 keymap.set("v", "<leader>x", ":'<,'>w !clip.exe<CR>")
 
 keymap.set("t", "<C-space>", "<C-\\><C-n>", { desc = "exit terminal properly" })
+
+vim.keymap.set("n", "<leader>fl", ":Telescope file_browser<CR>")

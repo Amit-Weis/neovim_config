@@ -13,6 +13,18 @@ return {
 
 		telescope.setup({
 			defaults = {
+				file_ignore_patterns = {
+					"node_modules/.*",
+					"%.env",
+					"yarn.lock",
+					"package-lock.json",
+					"lazy-lock.json",
+					"init.sql",
+					"target/.*",
+					".git/.*",
+					"undo/.*",
+					"undo",
+				},
 				path_display = { "smart" },
 				mappings = {
 					i = {

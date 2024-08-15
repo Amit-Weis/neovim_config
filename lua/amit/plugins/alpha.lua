@@ -1,6 +1,7 @@
 local file = io.open("tree.txt", "w+")
 os.execute("pybonsai > tree.txt")
 
+-- i dont like that change
 file:close()
 
 file = io.open("tree.txt", "r")
@@ -173,11 +174,15 @@ return {
 
 		-- Set header
 		dashboard.section.header.val = convert_ansi_tree_to_vim_hl_tree("tree2.txt")
+		-- Delete tree.txt, tree2.txt, and tree4.txt
+		os.remove("tree.txt")
+		os.remove("tree2.txt")
+		os.remove("tree4.txt")
 
 		-- Set menu
 		dashboard.section.buttons.val = {
-			dashboard.button("%", "  > New File", "<cmd>ene<CR>"),
 			dashboard.button("SPC ff", "󰱼  > Find File", "<cmd>Telescope find_files<CR>"),
+			dashboard.button("SPC fl", "󰱼  > File Browser", "<cmd>Telescope file_browser<CR>"),
 			dashboard.button("SPC <C-r>", "󰁯  > Restore Session", "<cmd>SessionRestore<CR>"),
 			dashboard.button("q", "  > Quit NVIM", "<cmd>qa<CR>"),
 		}
