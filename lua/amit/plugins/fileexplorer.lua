@@ -16,9 +16,6 @@ return {
 			},
 		})
 
-		-- Load the file browser extension
 		telescope.load_extension("file_browser")
-
-		-- Keymap to open file browser
 	end,
 }

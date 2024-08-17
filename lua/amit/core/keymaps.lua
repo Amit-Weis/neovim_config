@@ -11,6 +11,7 @@ local keymap = vim.keymap -- for conciseness
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
+keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>")
 -- window management
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
 keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
@@ -54,3 +55,5 @@ keymap.set("v", "<leader>x", ":'<,'>w !clip.exe<CR>")
 keymap.set("t", "<C-space>", "<C-\\><C-n>", { desc = "exit terminal properly" })
 
 vim.keymap.set("n", "<leader>fl", ":Telescope file_browser<CR>")
+
+vim.keymap.set("n", "<leader>c", "<cmd>NoiceDismiss<CR>")

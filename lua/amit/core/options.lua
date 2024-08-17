@@ -1,4 +1,3 @@
-print("hello")
 vim.cmd("let g:netrw_liststyle = 3")
 
 -- opt init
