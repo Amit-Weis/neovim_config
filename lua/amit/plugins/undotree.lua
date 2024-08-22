@@ -1,6 +1,8 @@
 return {
 	"mbbill/undotree",
 
+	event = { "BufReadPre", "BufNewFile" },
+
 	config = function()
 		-- Set keymap for toggling Undotree
 		vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>")
