@@ -87,6 +87,7 @@ return {
 			function(server_name)
 				lspconfig[server_name].setup({
 					capabilities = capabilities,
+					update_in_insert = false, -- Disable diagnostics while typing
 				})
 			end,
 			["svelte"] = function()
@@ -154,6 +155,26 @@ return {
 					root_dir = function()
 						return vim.loop.cwd() -- current working directory
 					end,
+				})
+			end,
+			["pylsp"] = function()
+				lspconfig["pylsp"].setup({
+					capabilities = capabilities,
+					on_attach = function(client, bufnr)
+						-- Disable all diagnostics
+						client.server_capabilities.diagnosticProvider = false
+					end,
+					settings = {
+						pylsp = {
+							plugins = {
+								pycodestyle = { enabled = false }, -- Disable pycodestyle
+								flake8 = { enabled = false }, -- Disable flake8
+								pylint = { enabled = false }, -- Disable pylint
+								mccabe = { enabled = false }, -- Disable mccabe
+								pyflakes = { enabled = false }, -- Disable pyflakes
+							},
+						},
+					},
 				})
 			end,
 		})
