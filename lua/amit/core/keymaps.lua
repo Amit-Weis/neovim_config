@@ -10,6 +10,7 @@ local keymap = vim.keymap -- for conciseness
 
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
+keymap.set("n", "<C-z>", "u")
 
 keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>")
 -- window management

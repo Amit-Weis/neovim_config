@@ -165,6 +165,9 @@ local function convert_ansi_tree_to_vim_hl_tree(file_path)
 	return center_tree(dashboard)
 end
 
+vim.keymap.set("n", "<leader>~~~~~~~~~~", function()
+	vim.notify("uRaID10T: Improper method to quit Neovim.", "error", { title = "QuitTime Error" })
+end)
 return {
 	"goolord/alpha-nvim",
 	event = "VimEnter",
@@ -181,10 +184,10 @@ return {
 
 		-- Set menu
 		dashboard.section.buttons.val = {
-			dashboard.button("SPC ff", "󰱼  > Find File", "<cmd>Telescope find_files<CR>"),
+			dashboard.button("SPC ff", "󰱼  > Fuzzy Finder", "<cmd>Telescope find_files<CR>"),
 			dashboard.button("SPC fl", "󰱼  > File Browser", "<cmd>Telescope file_browser<CR>"),
-			dashboard.button("SPC <C-r>", "󰁯  > Restore Session", "<cmd>SessionRestore<CR>"),
-			dashboard.button("q", "  > Quit NVIM", "<cmd>qa<CR>"),
+			dashboard.button("SPC gl", "󰊢  > Lazy Git", "<cmd>LazyGit<cr>"),
+			dashboard.button("idk bro", "  > Quit NVIM", "<leader>~~~~~~~~~~~"),
 		}
 
 		-- Send config to alpha
