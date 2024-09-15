@@ -9,6 +9,5 @@ return {
 	opts = { skip = true },
 	dependencies = {
 		"MunifTanjim/nui.nvim",
-		"rcarriga/nvim-notify",
 	},
 }

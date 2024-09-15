@@ -11,7 +11,7 @@ return {
 		vim.g.undotree_WindowLayout = 2 -- Layout option, you can customize this
 		vim.g.undotree_SplitWidth = 30 -- Width of the undotree window
 		vim.g.undotree_SetFocusWhenToggle = 1 -- Focus on the undotree window when opened
-		vim.g.undotree_TreeNodeShape = "" -- Change the node shape to a filled circle
+		vim.g.undotree_TreeNodeShape = "*" -- Change the node shape to a filled circle
 		vim.g.undotree_TreeVertShape = "│" -- Vertical line
 
 		-- Enable persistent undo in Neovim
