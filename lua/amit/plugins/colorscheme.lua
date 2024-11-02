@@ -1,19 +1,16 @@
 return {
-  -- Add other plugins here
+	-- Add other plugins here
 
-  -- Add rose-pine colorscheme plugin
-  {
-    'rose-pine/neovim',
-    name = 'rose-pine',
-    config = function()
-      require('rose-pine').setup({
-        disable_italics = true,
-        dim_nc_background = true
-      })
-      -- Set the colorscheme
-      vim.cmd('colorscheme rose-pine')
-    end
-  }
+	-- Add rose-pine colorscheme plugin
+	{
+		"rebelot/kanagawa.nvim",
+		config = function()
+			require("kanagawa").setup({
+				keywordStyle = { italic = false },
+				theme = "dragon",
+			})
+			-- Set the colorscheme
+			vim.cmd("colorscheme kanagawa")
+		end,
+	},
 }
-
-
