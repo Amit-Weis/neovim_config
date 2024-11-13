@@ -1,4 +1,3 @@
-print("hello")
 vim.cmd("let g:netrw_liststyle = 3")
 
 -- opt init
@@ -42,4 +41,4 @@ opt.splitbelow = true -- split horizontal window to the bottom
 -- scroll
 opt.scrolloff = 8
 opt.updatetime = 50
-opt.colorcolumn = "80"
+opt.colorcolumn = "100"

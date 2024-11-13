@@ -42,7 +42,7 @@ return {
 				keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
 
 				opts.desc = "See available code actions"
-				keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+				keymap.set({ "n", "v" }, "<leader>gca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
 				opts.desc = "Smart rename"
 				keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
@@ -68,8 +68,12 @@ return {
 		})
 
 		-- used to enable autocompletion (assign to every lsp server config)
-		local capabilities = cmp_nvim_lsp.default_capabilities()
+		local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
+		capabilities.textDocument.foldingRange = {
+			dynamicRegistration = false,
+			lineFoldingOnly = true,
+		}
 		-- Change the Diagnostic symbols in the sign column (gutter)
 		-- (not in youtube nvim video)
 		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
@@ -83,6 +87,7 @@ return {
 			function(server_name)
 				lspconfig[server_name].setup({
 					capabilities = capabilities,
+					update_in_insert = false, -- Disable diagnostics while typing
 				})
 			end,
 			["svelte"] = function()
@@ -140,8 +145,39 @@ return {
 					},
 				})
 			end,
+			["omnisharp"] = function()
+				lspconfig["omnisharp"].setup({
+					capabilities = capabilities,
+					cmd = { "dotnet", vim.fn.stdpath("data") .. "/mason/packages/omnisharp/libexec/OmniSharp.dll" },
+					enable_import_completion = true,
+					organize_imports_on_format = true,
+					enable_roslyn_analyzers = true,
+					root_dir = function()
+						return vim.loop.cwd() -- current working directory
+					end,
+				})
+			end,
+			["pylsp"] = function()
+				lspconfig["pylsp"].setup({
+					capabilities = capabilities,
+					on_attach = function(client, bufnr)
+						-- Disable all diagnostics
+						client.server_capabilities.diagnosticProvider = false
+					end,
+					settings = {
+						pylsp = {
+							plugins = {
+								pycodestyle = { enabled = false }, -- Disable pycodestyle
+								flake8 = { enabled = false }, -- Disable flake8
+								pylint = { enabled = false }, -- Disable pylint
+								mccabe = { enabled = false }, -- Disable mccabe
+								pyflakes = { enabled = false }, -- Disable pyflakes
+							},
+						},
+					},
+				})
+			end,
 		})
 	end,
 }
--- TODO: add the above configed lagnauges to mason
--- TODO: kys
+-- TODO: try and get started on screenkey_copy?
