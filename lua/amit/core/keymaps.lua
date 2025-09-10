@@ -22,6 +22,10 @@ keymap.set("n", "<leader>h", "<C-w>h", { desc = "move a window to the left" })
 keymap.set("n", "<leader>l", "<C-w>l", { desc = "move a window to the right" })
 keymap.set("n", "<leader>j", "<C-w>j", { desc = "move a window to the down" })
 keymap.set("n", "<leader>k", "<C-w>k", { desc = "move a window to the up" })
+keymap.set("n", "<leader>,", "<C-w>>", { desc = "resize a window to the left" })
+keymap.set("n", "<leader>.", "<C-w><", { desc = "resize a window to the right" })
+keymap.set("n", "<leader>'", "<C-w>+", { desc = "resize a window to the up" })
+keymap.set("n", "<leader>/", "<C-w>-", { desc = "resize a window to the down" })
 
 -- tab managment (not the character tab)
 keymap.set("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "Open new tab" }) -- open new tab
@@ -58,3 +62,17 @@ keymap.set("t", "<C-space>", "<C-\\><C-n>", { desc = "exit terminal properly" })
 vim.keymap.set("n", "<leader>fl", ":Telescope file_browser<CR>")
 
 vim.keymap.set("n", "<leader>c", "<cmd>NoiceDismiss<CR>")
+-- Open compiler
+vim.api.nvim_set_keymap("n", "<F6>", "<cmd>CompilerOpen<cr>", { noremap = true, silent = true })
+
+-- Redo last selected option
+vim.api.nvim_set_keymap(
+	"n",
+	"<S-F6>",
+	"<cmd>CompilerStop<cr>" -- (Optional, to dispose all tasks before redo)
+		.. "<cmd>CompilerRedo<cr>",
+	{ noremap = true, silent = true }
+)
+
+-- Toggle compiler results
+vim.api.nvim_set_keymap("n", "<S-F7>", "<cmd>CompilerToggleResults<cr>", { noremap = true, silent = true })
