@@ -1,4 +1,5 @@
 ## Introduction
+Please note that almost nothing in this guide works anymore, follow with some grains of salt ... 
 Hello! 
 My name is Amit Weis and I have recently gotten really into neovim. here is the culmination of all my efforts these past few weeks. 
 
