@@ -3,9 +3,7 @@ return {
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
 		local lint = require("lint")
-		--------------------------------------------------------------------
-		-- LINTERS
-		--------------------------------------------------------------------
+
 		lint.linters_by_ft = {
 			javascript = { "eslint_d" },
 			typescript = { "eslint_d" },
@@ -16,29 +14,31 @@ return {
 			cpp = { "cpplint" },
 			lua = { "luacheck" },
 		}
+
 		local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+
+		-- Clear the default lint on events
 		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 			group = lint_augroup,
 			callback = function()
 				local bufnr = vim.api.nvim_get_current_buf()
 				lint.try_lint()
-				-- FULL reset: removes signs, diagnostic entries, and virtual text
 				vim.diagnostic.reset(nil, bufnr)
 			end,
 		})
+
 		vim.keymap.set("n", "<leader>L", function()
 			lint.try_lint()
 		end, { desc = "Trigger linting for current file" })
-		--------------------------------------------------------------------
+
 		-- CUSTOM DIAGNOSTIC DISPLAY RULES
-		--------------------------------------------------------------------
-		-- Signs
 		local signs = {
 			Error = " ",
 			Warn = " ",
 			Hint = " ",
 			Info = " ",
 		}
+
 		for t, icon in pairs(signs) do
 			local hl = "DiagnosticSign" .. t
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
@@ -105,7 +105,7 @@ return {
 
 		-- Configure diagnostics: disable default virtual_text, keep everything else
 		vim.diagnostic.config({
-			virtual_text = false, -- We handle this ourselves
+			virtual_text = false,
 			signs = true,
 			underline = true,
 			update_in_insert = false,
@@ -139,7 +139,6 @@ return {
 			callback = function()
 				local bufnr = vim.api.nvim_get_current_buf()
 
-				-- FULL reset: removes signs, diagnostic entries, and virtual text
 				vim.diagnostic.reset(nil, bufnr)
 				vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
 
@@ -169,7 +168,7 @@ return {
 				local bufnr = vim.api.nvim_get_current_buf()
 				vim.diagnostic.show(nil, bufnr)
 				last_cursor_line = -1
-				-- Don't call update_virtual_text() here; CursorMoved will handle it
+				-- Don't call update_virtual_text() here CursorMoved will handle it
 			end,
 		})
 	end,
