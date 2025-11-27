@@ -22,6 +22,7 @@ return {
 			callback = function()
 				local bufnr = vim.api.nvim_get_current_buf()
 				lint.try_lint()
+				-- FULL reset: removes signs, diagnostic entries, and virtual text
 				vim.diagnostic.reset(nil, bufnr)
 			end,
 		})
