@@ -1,7 +1,4 @@
 return {
-	-- Add other plugins here
-
-	-- Add rose-pine colorscheme plugin
 	{
 		"rebelot/kanagawa.nvim",
 		config = function()

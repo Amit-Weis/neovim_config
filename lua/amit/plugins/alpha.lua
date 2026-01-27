@@ -141,8 +141,7 @@
 -- 				end
 -- 				i = i + 1
 -- 			else
--- 				-- Skip the escape sequence
--- 				i = i + 2
+-- 				-- Skip the escape sequence i = i + 2
 -- 				local ansi_code = ""
 -- 				while line:sub(i, i) ~= "m" do
 -- 					ansi_code = ansi_code .. line:sub(i, i)
@@ -177,16 +176,11 @@ return {
 
 		-- Set header
 		dashboard.section.header.val = ""
-		-- Delete tree.txt, tree2.txt, and tree4.txt
-		os.remove("tree.txt")
-		os.remove("tree2.txt")
-		os.remove("tree4.txt")
 
 		-- Set menu
 		dashboard.section.buttons.val = {
 			dashboard.button("SPC ff", "󰱼  > Fuzzy Finder", "<cmd>Telescope find_files<CR>"),
 			dashboard.button("SPC fl", "󰱼  > File Browser", "<cmd>Telescope file_browser<CR>"),
-			dashboard.button("SPC gl", "󰊢  > Lazy Git", "<cmd>LazyGit<cr>"),
 			dashboard.button("idk bro", "  > Quit NVIM", "<leader>~~~~~~~~~~~"),
 		}
 
