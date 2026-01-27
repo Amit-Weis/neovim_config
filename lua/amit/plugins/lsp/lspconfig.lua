@@ -12,9 +12,8 @@ return {
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 		local keymap = vim.keymap
 
-		-- global diagnostic settings
 		vim.diagnostic.config({
-			virtual_text = true,
+			virtual_text = false, -- Let nvim-lint handle virtual text
 			signs = true,
 			underline = true,
 			update_in_insert = false,
@@ -76,7 +75,7 @@ return {
 		}
 
 		-- diagnostic icons
-		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+		local signs = { Error = "✘ ", Warn = "▲ ", Hint = "⚑ ", Info = "» " }
 		for type, icon in pairs(signs) do
 			local hl = "DiagnosticSign" .. type
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
@@ -140,9 +139,10 @@ return {
 					settings = {
 						pylsp = {
 							plugins = {
+								-- DISABLE all pylsp linters since nvim-lint handles them
 								pycodestyle = { enabled = false },
 								flake8 = { enabled = false },
-								pylint = { enabled = true }, -- keep one for inline diagnostics
+								pylint = { enabled = false }, -- Disabled - nvim-lint handles this
 								mccabe = { enabled = false },
 								pyflakes = { enabled = false },
 							},
